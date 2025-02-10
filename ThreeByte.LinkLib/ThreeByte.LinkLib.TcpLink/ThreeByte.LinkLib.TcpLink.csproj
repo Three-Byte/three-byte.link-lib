@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <PackageId>ThreeByte.LinkLib.TcpLink</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Dev Team</Authors>
+    <Company>Three Byte Intermedia</Company>
+    <PackageDescription>Class lib for TCP.</PackageDescription>
+    <RepositoryUrl>https://github.com/Three-Byte/three-byte.link-lib</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ThreeByte.LinkLib.Shared\ThreeByte.LinkLib.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
