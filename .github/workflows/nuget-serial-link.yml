@@ -13,7 +13,7 @@ env:
   GITHUB_REPO: "three-byte.link-lib"
   PROJECT_PATH: "ThreeByte.LinkLib"
   PROJECT_NAME: "ThreeByte.LinkLib.SerialLink"
-  INITIAL_PACKAGE_VERSION: "0.0.1"
+  INITIAL_PACKAGE_VERSION: "1.0.0"
   NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
 jobs:
@@ -24,6 +24,7 @@ jobs:
     outputs:
       package_new_version: ${{ steps.package_new_version.outputs.package_new_version }}
       package_version: ${{ steps.package_version.outputs.package_version }}
+      first_deploy: ${{ steps.package_version.outputs.first_deploy }}
     steps:
       - name: GitHub actions Workspace Cleaner
         uses: jstone28/runner-workspace-cleaner@v1.0.0
@@ -58,10 +59,12 @@ jobs:
           status_code=$(curl -o /dev/null -s -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$package_name_lower_case/index.json")
           if [ "$status_code" -eq 200 ]; then
             echo "Package '$package_name_lower_case' exists on NuGet.org."
+            first_deploy="false"
             package_version=$(curl -s https://api.nuget.org/v3-flatcontainer/$package_name_lower_case/index.json | grep -o '"[0-9]\+\(\.[0-9]\+\)*"' | tail -n 1 | tr -d '"')
           else
             echo "Package '$package_name_lower_case' does NOT exist on NuGet.org."
             package_version=${{ env.INITIAL_PACKAGE_VERSION }}
+            first_deploy="true"
           fi
           echo "package_version = $package_version"
 
@@ -99,7 +102,11 @@ jobs:
           elif [[ $label_name == 'patch' ]]; then
               patch=$((patch+1))
           fi
-          package_new_version=$major"."$minor"."$patch
+          if [ ${{ steps.package_version.outputs.first_deploy }} == "true" ]; then
+            package_new_version=${{ env.INITIAL_PACKAGE_VERSION }}
+          else
+            package_new_version=$major"."$minor"."$patch
+          fi
           echo -e "Package new version:\t\t $package_new_version"
 
       - name: Create NuGet Package
