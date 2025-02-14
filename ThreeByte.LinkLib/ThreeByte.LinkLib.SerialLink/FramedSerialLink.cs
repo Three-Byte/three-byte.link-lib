@@ -10,10 +10,10 @@ namespace ThreeByte.LinkLib.SerialLink
 {
     public class FramedSerialLink
     {
-        public event EventHandler<Exception> ErrorOccurred;
-        public event EventHandler DataReceived;
-        public SerialFrame SendFrame { get; set; }
-        public SerialFrame ReceiveFrame { get; set; }
+        public event EventHandler<Exception>? ErrorOccurred;
+        public event EventHandler? DataReceived;
+        public SerialFrame? SendFrame { get; set; }
+        public SerialFrame? ReceiveFrame { get; set; }
         public bool IsConnected => _serialLink.IsConnected;
         public bool IsEnabled => _serialLink.IsEnabled;
         public bool HasData => _incomingData.Count > 0;
@@ -113,7 +113,7 @@ namespace ThreeByte.LinkLib.SerialLink
         /// Fetches and removes (pops) the next available message as received on this link in order (FIFO)
         /// </summary>
         /// <returns>null if the link is not Enabled or there are no messages currently queued to return, a string otherwise.</returns>
-        public string GetMessage()
+        public string? GetMessage()
         {
             if (_isDisposed)
             {
@@ -126,7 +126,7 @@ namespace ThreeByte.LinkLib.SerialLink
                 return null;
             }
 
-            string newMessage = null;
+            string? newMessage = null;
             lock (_incomingData)
             {
                 if (HasData)
@@ -178,7 +178,7 @@ namespace ThreeByte.LinkLib.SerialLink
             {
                 lock (_incomingBuffer)
                 {
-                    byte[] buffer = _serialLink.GetMessage();
+                    byte[]? buffer = _serialLink.GetMessage();
 
                     //Must validate this buffer - see issue #4934
                     if (buffer == null)
