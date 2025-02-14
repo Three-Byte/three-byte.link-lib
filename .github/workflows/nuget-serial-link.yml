@@ -38,7 +38,11 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          pwd
+          ls -al
+          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+          dotnet restore
         working-directory: ./${{ env.PROJECT_PATH }}
 
       - name: Build the project
