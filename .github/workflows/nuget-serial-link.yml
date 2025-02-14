@@ -32,6 +32,9 @@ jobs:
       - name: GitHub actions Workspace Cleaner
         uses: jstone28/runner-workspace-cleaner@v1.0.0
 
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
@@ -39,41 +42,40 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          # ls -alR *
           pwd
-          ls
-      #     # ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
-      #     # dotnet restore
-      #   working-directory: ./${{ env.PROJECT_PATH }}
+          ls -al
+          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+          dotnet restore
+        working-directory: ./${{ env.PROJECT_PATH }}
 
-      # - name: Build the project
-      #   run: dotnet build --configuration Release --no-restore
-      #   working-directory: ./${{ env.PROJECT_PATH }}
+      - name: Build the project
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./${{ env.PROJECT_PATH }}
 
-      # - name: Create NuGet Package
-      #   run: |
-      #     pwd
-      #     ls -al
-      #     ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
-      #     echo ""
-      #     dotnet pack -c Release /p:Version=${{ env.INITIAL_PACKAGE_VERSION }} # Need to remove INITIAL_PACKAGE_VERSION
-      #   working-directory: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+      - name: Create NuGet Package
+        run: |
+          pwd
+          ls -al
+          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+          echo ""
+          dotnet pack -c Release /p:Version=${{ env.INITIAL_PACKAGE_VERSION }} # Need to remove INITIAL_PACKAGE_VERSION
+        working-directory: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
 
-      # - name: Archive NuGet Package
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ env.PROJECT_NAME }}
-      #     path: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkg
+      - name: Archive NuGet Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}
+          path: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkg
 
-      # - name: Publish Nuget Package
-      #   run: |
-      #     pwd
-      #     ls -al dotnet nuget push ./${{ env.PROJECT_NAME }}/bin/Release/
-      #     echo dotnet nuget push ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkgs \
-      #       --api-key ${{ secrets.NUGET_API_KEY }} \
-      #       --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish Nuget Package
+        run: |
+          pwd
+          ls -al dotnet nuget push ./${{ env.PROJECT_NAME }}/bin/Release/
+          echo dotnet nuget push ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkgs \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-      #     # dotnet nuget push nupkg/*.nupkg --api-key ${{ env.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          # dotnet nuget push nupkg/*.nupkg --api-key ${{ env.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       # - name: Check labels
       #   uses: docker://agilepathway/pull-request-label-checker:latest
