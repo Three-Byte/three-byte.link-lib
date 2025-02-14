@@ -1,0 +1,167 @@
+name: NuGet ThreeByte.LinkLib.SerialLink
+
+on:
+  push:
+    branches:
+      - feature/add-nuget-pipelines
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "ThreeByte.LinkLib/ThreeByte.LinkLib.SerialLink/**"
+    types:
+      - closed
+
+env:
+  PROJECT_PATH: "ThreeByte.LinkLib"
+  PROJECT_NAME: "ThreeByte.LinkLib.SerialLink"
+  INITIAL_PACKAGE_VERSION: "0.0.1"
+  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+jobs:
+  variables:
+    name: Set variables
+    # if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    # outputs:
+      # PACKAGE_VERSION: ${{ steps.step1.outputs.PACKAGE_VERSION }}
+      # PROJECT_NAME: ${{ steps.step1.outputs.PROJECT_NAME }}
+      # new_version: ${{ steps.new_version.outputs.new_version }}
+      # package_exist: ${{ steps.check_package.outputs.package_exist }}
+    steps:
+      - name: GitHub actions Workspace Cleaner
+        uses: jstone28/runner-workspace-cleaner@v1.0.0
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Create NuGet Package
+        run: dotnet pack -c Release /p:Version=${{ env.INITIAL_PACKAGE_VERSION }} # Need to remove INITIAL_PACKAGE_VERSION
+        working-directory: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+
+      - name: Archive NuGet Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}
+          path: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkg
+
+      - name: Publish Nuget Package
+        run: |
+          pwd
+          ls -al dotnet nuget push ./${{ env.PROJECT_NAME }}/bin/Release/
+          echo dotnet nuget push ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkgs \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+          # dotnet nuget push nupkg/*.nupkg --api-key ${{ env.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      # - name: Check labels
+      #   uses: docker://agilepathway/pull-request-label-checker:latest
+      #   id: check_label
+      #   with:
+      #     one_of: major,minor,patch
+      #     repo_token: ${{ secrets.GHPAT }}
+
+      # - name: Check if package exists
+      #   id: check_package
+      #   run: |
+      #     package_exist=$(curl \
+      #       -H "Accept: application/vnd.github+json" \
+      #       -H "Authorization: Bearer ${{ secrets.GHPAT }}"\
+      #       -H "X-GitHub-Api-Version: 2022-11-28" \
+      #       https://api.github.com/orgs/lcgrub/packages/nuget/${{ env.PROJECT_NAME }}/versions | jq '.message' | sed 's/"//g')
+
+      #     if [[ $package_exist == "Package not found." ]]; then
+      #       package_exist=false
+      #     else
+      #       package_exist=true
+      #     fi
+
+      #     echo "package_exist=$package_exist"
+      #     echo "package_exist=$package_exist" >> $GITHUB_OUTPUT
+
+      # - name: Get latest release number
+      #   if: ${{ steps.check_package.outputs.package_exist == 'true' }}
+      #   id: get_release_number
+      #   uses: octokit/request-action@v2.1.0
+      #   with:
+      #     route: GET /orgs/lcgrub/packages/nuget/${{ env.PROJECT_NAME }}/versions
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GHPAT }}
+
+      # - name: Get latest release version
+      #   id: latest_release_version
+      #   run: |
+      #     echo ${{ steps.check_package.outputs.package_exist }}
+
+      #     if ${{ steps.check_package.outputs.package_exist }}; then
+      #       latest_release_version=$(echo '${{ steps.get_release_number.outputs.data }}' | jq '.[0].name' | sed 's/"//g')
+      #       echo "Latest release number: $latest_release_version"
+      #       echo "latest_release_version=$(echo '${{ steps.get_release_number.outputs.data }}' | jq '.[0].name' | sed 's/"//g')" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "Latest release number: $INITIAL_PACKAGE_VERSION"
+      #       echo "latest_release_version=$INITIAL_PACKAGE_VERSION" >> $GITHUB_OUTPUT
+      #     fi
+
+  #     - name: Check latest release version
+  #       run: |
+  #         echo "Latest release version: ${{ steps.latest_release_version.outputs.latest_release_version }}"
+
+  #     - name: Get label by PR number
+  #       id: get_label_by_pr
+  #       uses: octokit/request-action@v2.1.0
+  #       with:
+  #         route: GET /repos/lcgrub/${{ env.GITHUB_REPO }}/pulls/${{ github.event.pull_request.number }}
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GHPAT }}
+
+  #     - name: Get new version
+  #       id: new_version
+  #       run: |
+  #         label_name=$(echo '${{ steps.get_label_by_pr.outputs.data }}' | jq '.labels[0].name' | sed 's/"//g')
+  #         echo -e "Label name:\t\t $label_name"
+  #         echo "label_name=$(echo '${{ steps.get_label_by_pr.outputs.data }}' | jq '.labels[0].name' | sed 's/"//g')" >> $GITHUB_OUTPUT
+
+  #         major=$(echo ${{ steps.latest_release_version.outputs.latest_release_version }} | cut -d "." -f1)
+  #         minor=$(echo ${{ steps.latest_release_version.outputs.latest_release_version }} | cut -d "." -f2)
+  #         patch=$(echo ${{ steps.latest_release_version.outputs.latest_release_version }} | cut -d "." -f3)
+
+  #         echo -e "Current version:\t $major.$minor.$patch"
+
+  #         if [[ $label_name == 'major' ]]; then
+  #           major=$((major+1))
+  #           if [[ $minor -ne 0 ]]; then
+  #             minor=0
+  #           fi
+  #           if [[ $patch -ne 0 ]]; then
+  #             patch=0
+  #           fi
+  #         elif [[ $label_name == 'minor' ]]; then
+  #           minor=$((minor+1))
+  #           if [[ $patch -ne 0 ]]; then
+  #             patch=0
+  #           fi
+  #         elif [[ $label_name == 'patch' ]]; then
+  #             patch=$((patch+1))
+  #         fi
+
+  #         new_version=$major"."$minor"."$patch
+
+  #         echo -e "New version:\t\t $new_version"
+  #         echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+  #     - name: Setup env variables
+  #       id: step1
+  #       run: echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
+
+  # build:
+  #   name: Call workflow
+  #   needs: variables
+  #   uses: ./.github/workflows/nuget-base.yml
+  #   secrets: inherit
+  #   if: github.event.pull_request.merged == true
+  #   with:
+  #     PACKAGE_VERSION: ${{ needs.variables.outputs.new_version }}
+  #     PROJECT_NAME: ${{ needs.variables.outputs.PROJECT_NAME }}
