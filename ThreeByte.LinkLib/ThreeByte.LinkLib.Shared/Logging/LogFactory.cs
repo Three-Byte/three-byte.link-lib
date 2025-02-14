@@ -1,15 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace ThreeByte.LinkLib.Shared.Logging;
-
-public class LogFactory
+namespace ThreeByte.LinkLib.Shared.Logging
 {
-    public static ILogger Create<T>()
+    public class LogFactory
     {
-        var factory = LoggerFactory.Create(builder => {
-            builder.AddConsole();
-        });
+        public static ILogger Create<T>()
+        {
+            var factory = LoggerFactory.Create(builder => {
+                builder.AddConsole();
+            });
 
-        return factory.CreateLogger<T>();
+            return factory.CreateLogger<T>();
+        }
     }
 }

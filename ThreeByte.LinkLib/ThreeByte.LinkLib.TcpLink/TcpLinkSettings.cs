@@ -1,14 +1,15 @@
-﻿namespace ThreeByte.LinkLib.TcpLink;
-
-public record class TcpLinkSettings
+﻿namespace ThreeByte.LinkLib.TcpLink
 {
-    public string Address { get; }
-
-    public int Port { get; }
-
-    public TcpLinkSettings(string address, int port)
+    public class TcpLinkSettings
     {
-        Address = address;
-        Port = port;
+        public string Address { get; }
+
+        public int Port { get; }
+
+        public TcpLinkSettings(string address, int port)
+        {
+            Address = address;
+            Port = port;
+        }
     }
 }
