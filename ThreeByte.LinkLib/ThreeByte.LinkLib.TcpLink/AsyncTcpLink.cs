@@ -9,10 +9,10 @@ namespace ThreeByte.LinkLib.TcpLink
 {
     public class AsyncTcpLink : IDisposable
     {
-        public event EventHandler<bool> IsConnectedChanged;
-        public event EventHandler<bool> IsEnabledChanged;
-        public event EventHandler<Exception> ErrorOccurred;
-        public event EventHandler DataReceived;
+        public event EventHandler<bool>? IsConnectedChanged;
+        public event EventHandler<bool>? IsEnabledChanged;
+        public event EventHandler<Exception>? ErrorOccurred;
+        public event EventHandler? DataReceived;
         public bool IsConnected => _isConnected;
         public bool IsEnabled => _isEnabled;
         public string Address => _settings.Address;
@@ -30,12 +30,12 @@ namespace ThreeByte.LinkLib.TcpLink
         private bool _isConnected = false;
         private List<byte[]> _incomingData = new List<byte[]>();
         private object _clientLock = new object();
-        private IAsyncResult _connectResult = null;
-        private IAsyncResult _readResult = null;
-        private IAsyncResult _writeResult = null;
+        private IAsyncResult? _connectResult;
+        private IAsyncResult? _readResult;
+        private IAsyncResult? _writeResult;
 
-        private TcpClient _tcpClient;
-        private NetworkStream _networkStream;
+        private TcpClient? _tcpClient;
+        private NetworkStream? _networkStream;
 
         public AsyncTcpLink(string address, int port)
             : this(address, port, true)

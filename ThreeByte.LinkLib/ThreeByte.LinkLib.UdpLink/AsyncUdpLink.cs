@@ -9,9 +9,9 @@ namespace ThreeByte.LinkLib.UdpLink
 {
     public class AsyncUdpLink
     {
-        public event EventHandler<bool> IsEnabledChanged;
-        public event EventHandler<Exception> ErrorOccurred;
-        public event EventHandler DataReceived;
+        public event EventHandler<bool>? IsEnabledChanged;
+        public event EventHandler<Exception>? ErrorOccurred;
+        public event EventHandler? DataReceived;
         public bool IsEnabled => _isEnabled;
         public string Address => _settings.Address;
         public int Port => _settings.RemotePort;
@@ -26,10 +26,10 @@ namespace ThreeByte.LinkLib.UdpLink
         private bool _isDisposed = false;
         private List<byte[]> _incomingData = new List<byte[]>();
         private object _clientLock = new object();
-        private IAsyncResult _receiveResult = null;
-        private IAsyncResult _sendResult = null;
+        private IAsyncResult? _receiveResult;
+        private IAsyncResult? _sendResult;
 
-        private UdpClient _udpClient;
+        private UdpClient? _udpClient;
 
         public AsyncUdpLink(string address, int remotePort, int localPort = 0, bool enabled = true)
             : this(new UdpLinkSettings(address, remotePort, localPort), enabled)
@@ -76,7 +76,7 @@ namespace ThreeByte.LinkLib.UdpLink
         /// <returns>
         /// null if the link is not Enabled or there is no data currently queued to return, an array of bytes otherwise.
         /// </returns>
-        public byte[] GetMessage()
+        public byte[]? GetMessage()
         {
             if (_isDisposed)
             {
@@ -88,7 +88,7 @@ namespace ThreeByte.LinkLib.UdpLink
                 return null;
             }
 
-            byte[] newMessage = null;
+            byte[]? newMessage = null;
             lock (_incomingData)
             {
                 if (HasData)
@@ -232,7 +232,7 @@ namespace ThreeByte.LinkLib.UdpLink
                             while (_incomingData.Count > MaxDataSize)
                             {
                                 //Purge messages from the end of the list to prevent overflow
-                                _logger.LogError("Too many incoming messages to handle: {cnt}.", _incomingData.Count);
+                                _logger.LogError("Too many incoming messages to handle: {qty}.", _incomingData.Count);
                                 _incomingData.RemoveAt(_incomingData.Count - 1);
                             }
                         }

@@ -2,7 +2,7 @@
 {
     public class SerialFrame
     {
-        public byte[] Header { get; set; }
-        public byte[] Footer { get; set; }
+        public byte[] Header { get; set; } = null!;
+        public byte[] Footer { get; set; } = null!;
     }
 }

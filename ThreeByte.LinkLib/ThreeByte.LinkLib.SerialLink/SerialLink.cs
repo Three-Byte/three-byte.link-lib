@@ -8,10 +8,10 @@ namespace ThreeByte.LinkLib.SerialLink
 {
     public class SerialLink : IDisposable
     {
-        public event EventHandler<bool> IsEnabledChanged;
-        public event EventHandler<bool> IsConnectedChanged;
-        public event EventHandler<Exception> ErrorOccurred;
-        public event EventHandler DataReceived;
+        public event EventHandler<bool>? IsEnabledChanged;
+        public event EventHandler<bool>? IsConnectedChanged;
+        public event EventHandler<Exception>? ErrorOccurred;
+        public event EventHandler? DataReceived;
         public bool IsConnected => _isConnected;
         public bool IsEnabled => _isEnabled;
         public bool HasData => _incomingData.Count > 0;
@@ -26,7 +26,7 @@ namespace ThreeByte.LinkLib.SerialLink
         private bool _isConnected = false;
         private List<byte[]> _incomingData = new List<byte[]>();
         private object _serialLock = new object();
-        private SerialPort _serialPort;
+        private SerialPort? _serialPort;
 
         public SerialLink(string comPort, int baudRate = 9600, int dataBits = 8, Parity parity = Parity.None, bool enabled = true)
             : this(new SerialLinkSettings(comPort, baudRate, dataBits, parity), enabled)
@@ -63,7 +63,7 @@ namespace ThreeByte.LinkLib.SerialLink
             }
         }
 
-        public byte[] GetMessage()
+        public byte[]? GetMessage()
         {
             if (_isDisposed)
             {
@@ -75,7 +75,7 @@ namespace ThreeByte.LinkLib.SerialLink
                 return null;
             }
 
-            byte[] newMessage = null;
+            byte[]? newMessage = null;
             lock (_incomingData)
             {
                 if (HasData)
