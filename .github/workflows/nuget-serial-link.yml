@@ -52,16 +52,10 @@ jobs:
         run: dotnet pack --configuration Release --no-build --output nupkg --property:Version=${{ env.INITIAL_PACKAGE_VERSION }} # Need to remove INITIAL_PACKAGE_VERSION
         working-directory: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
 
-      - name: Archive NuGet Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.PROJECT_NAME }}
-          path: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkg
-
       - name: Publish Nuget Package
         run: |
-          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/
-          dotnet nuget push ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkgs \
+          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/nuget/
+          dotnet nuget push ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/nuget/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkg \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json --skip-duplicate
 
