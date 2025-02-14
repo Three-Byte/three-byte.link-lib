@@ -39,8 +39,9 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          ls -alR *
+          # ls -alR *
           pwd
+          ls
       #     # ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
       #     # dotnet restore
       #   working-directory: ./${{ env.PROJECT_PATH }}
