@@ -64,7 +64,9 @@ jobs:
       - name: Publish Nuget Package
         run: |
           pwd
-          ls -al dotnet nuget push ./${{ env.PROJECT_NAME }}/bin/Release/
+          ls -alR ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+          echo "------------------"
+          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/
           echo dotnet nuget push ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/bin/Release/${{ env.PROJECT_NAME }}.${{ env.INITIAL_PACKAGE_VERSION }}.nupkgs \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json --skip-duplicate
