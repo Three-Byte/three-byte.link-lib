@@ -41,12 +41,8 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore dependencies
-        run: |
-          pwd
-          ls -al
-          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
-          dotnet restore
-        working-directory: ./${{ env.PROJECT_PATH }}
+        run: dotnet restore
+        working-directory: ./${{ env.PROJECT_PATH }} # /home/runner/work/three-byte.link-lib/three-byte.link-lib/ThreeByte.LinkLib
 
       - name: Build the project
         run: dotnet build --configuration Release --no-restore
@@ -56,8 +52,6 @@ jobs:
         run: |
           pwd
           ls -al
-          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
-          echo ""
           dotnet pack -c Release /p:Version=${{ env.INITIAL_PACKAGE_VERSION }} # Need to remove INITIAL_PACKAGE_VERSION
         working-directory: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
 
