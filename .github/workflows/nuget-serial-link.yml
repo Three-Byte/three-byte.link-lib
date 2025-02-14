@@ -20,7 +20,7 @@ env:
 
 jobs:
   variables:
-    name: Set variables
+    name: Build and push Nuget package
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     # outputs:
@@ -37,8 +37,21 @@ jobs:
         with:
           dotnet-version: "9.0.x"
 
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./${{ env.PROJECT_PATH }}
+
+      - name: Build the project
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./${{ env.PROJECT_PATH }}
+
       - name: Create NuGet Package
-        run: dotnet pack -c Release /p:Version=${{ env.INITIAL_PACKAGE_VERSION }} # Need to remove INITIAL_PACKAGE_VERSION
+        run: |
+          pwd
+          ls -al
+          ls -al ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+          echo ""
+          dotnet pack -c Release /p:Version=${{ env.INITIAL_PACKAGE_VERSION }} # Need to remove INITIAL_PACKAGE_VERSION
         working-directory: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
 
       - name: Archive NuGet Package
