@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "ThreeByte.LinkLib/ThreeByte.LinkLib.SerialLink/**"
+      - "ThreeByte.LinkLib/ThreeByte.LinkLib.TcpLink/**"
+      - "ThreeByte.LinkLib/ThreeByte.LinkLib.UdpLink/**"
     types:
       - opened
       - synchronize
