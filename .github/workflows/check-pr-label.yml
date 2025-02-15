@@ -1,0 +1,27 @@
+name: Check PR Label
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+
+jobs:
+  variables:
+    name: Check attached label
+    runs-on: ubuntu-latest
+    steps:
+      - name: GitHub actions Workspace Cleaner
+        uses: jstone28/runner-workspace-cleaner@v1.0.0
+
+      - name: Check labels
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        id: check_label
+        with:
+          one_of: major,minor,patch
+          repo_token: ${{ secrets.GHPAT }}
