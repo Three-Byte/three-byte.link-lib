@@ -85,6 +85,28 @@ class Program
 }
 ```
 
+## How to Build and Publish NuGet Packages using pipelines
+
+To build and publish NuGet packages, follow these steps:
+1. Create a new GitHub branch and switch to it
+2. Update the source code in any of the following `ThreeByte.LinkLib` folders:
+- ThreeByte.LinkLib.SerialLink
+- ThreeByte.LinkLib.TcpLink
+- ThreeByte.LinkLib.UdpLink
+
+**Note:** The pipeline will only be triggered when changes are made in these folders
+
+3. Commit and push your changes to the GitHub repository.
+4. Create a pull request to the main branch and attach one of the following labels based on the type of change you made:
+- major
+- minor
+- patch
+
+**Note:** The version of the new NuGet package is determined by the attached label. We follow [Semantic Versioning](https://semver.org/)
+
+5. Merge your pull request
+6. Wait approximately 5 minutes — your NuGet package will then be available on [nuget.org](https://www.nuget.org/profiles/olaaf)
+
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request with your changes.
 
@@ -92,7 +114,8 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 ...
 
 ## Contact
-For any questions or issues, please open an issue on GitHub or contact us at ....
+For any questions or issues, please contact us at `support@mail`.
 ```
-
-Feel free to customize this example to better fit your specific library and its features! If you have any other questions or need further assistance, let me know.
+Feel free to customize this example to better fit your specific library and its features!
+If you have any other questions or need further assistance, let me know.
+```
