@@ -115,4 +115,7 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 ## Contact
 For any questions or issues, please contact us at `support@mail`.
->```Feel free to customize this example to better fit your specific library and its features! If you have any other questions or need further assistance, let me know. ```
+```
+Feel free to customize this example to better fit your specific library and its features!
+If you have any other questions or need further assistance, let me know.
+```
