@@ -1,0 +1,123 @@
+name: NuGet ThreeByte.LinkLib.NetBooter
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "ThreeByte.LinkLib/ThreeByte.LinkLib.NetBooter/**"
+    types:
+      - closed
+
+env:
+  GITHUB_REPO: "three-byte.link-lib"
+  PROJECT_PATH: "ThreeByte.LinkLib"
+  PROJECT_NAME: "ThreeByte.LinkLib.NetBooter"
+  INITIAL_PACKAGE_VERSION: "1.0.0"
+  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+jobs:
+  variables:
+    name: Build and push Nuget package
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      package_new_version: ${{ steps.package_new_version.outputs.package_new_version }}
+      package_version: ${{ steps.package_version.outputs.package_version }}
+      first_deploy: ${{ steps.package_version.outputs.first_deploy }}
+    steps:
+      - name: GitHub actions Workspace Cleaner
+        uses: jstone28/runner-workspace-cleaner@v1.0.0
+
+      - name: Check labels
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        id: check_label
+        with:
+          one_of: major,minor,patch
+          repo_token: ${{ secrets.GHPAT }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./${{ env.PROJECT_PATH }}
+
+      - name: Build the project
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./${{ env.PROJECT_PATH }}
+
+      - name: Get package version
+        id: package_version
+        run: |
+          package_name_lower_case=$(echo ${{ env.PROJECT_NAME }} | tr '[:upper:]' '[:lower:]' )
+          status_code=$(curl -o /dev/null -s -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/$package_name_lower_case/index.json")
+          if [ "$status_code" -eq 200 ]; then
+            echo "Package '$package_name_lower_case' exists on NuGet.org."
+            first_deploy="false"
+            package_version=$(curl -s https://api.nuget.org/v3-flatcontainer/$package_name_lower_case/index.json | grep -o '"[0-9]\+\(\.[0-9]\+\)*"' | tail -n 1 | tr -d '"')
+          else
+            echo "Package '$package_name_lower_case' does NOT exist on NuGet.org."
+            package_version=${{ env.INITIAL_PACKAGE_VERSION }}
+            first_deploy="true"
+          fi
+          echo -e "package_version\t= $package_version"
+          echo -e "first_deploy\t= $first_deploy"
+          echo "package_version=$package_version" >> $GITHUB_OUTPUT
+          echo "first_deploy=$first_deploy" >> $GITHUB_OUTPUT
+
+      - name: Get label by PR number
+        id: get_label_by_pr
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/Three-Byte/${{ env.GITHUB_REPO }}/pulls/${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHPAT }}
+
+      - name: Get new version
+        id: package_new_version
+        run: |
+          label_name=$(echo '${{ steps.get_label_by_pr.outputs.data }}' | jq '.labels[0].name' | sed 's/"//g')
+          echo -e "Label name:\t\t $label_name"
+          major=$(echo ${{ steps.package_version.outputs.package_version }} | cut -d "." -f1)
+          minor=$(echo ${{ steps.package_version.outputs.package_version }} | cut -d "." -f2)
+          patch=$(echo ${{ steps.package_version.outputs.package_version }} | cut -d "." -f3)
+          echo -e "Current version:\t $major.$minor.$patch"
+          if [[ $label_name == 'major' ]]; then
+            major=$((major+1))
+            if [[ $minor -ne 0 ]]; then
+              minor=0
+            fi
+            if [[ $patch -ne 0 ]]; then
+              patch=0
+            fi
+          elif [[ $label_name == 'minor' ]]; then
+            minor=$((minor+1))
+            if [[ $patch -ne 0 ]]; then
+              patch=0
+            fi
+          elif [[ $label_name == 'patch' ]]; then
+              patch=$((patch+1))
+          fi
+          if [ ${{ steps.package_version.outputs.first_deploy }} == "true" ]; then
+            package_new_version=${{ env.INITIAL_PACKAGE_VERSION }}
+          else
+            package_new_version=$major"."$minor"."$patch
+          fi
+          echo -e "Package new version:\t\t $package_new_version"
+          echo "package_new_version=$package_new_version" >> $GITHUB_OUTPUT
+
+      - name: Create NuGet Package
+        run: dotnet pack --configuration Release --no-build --output nupkg --property:Version=${{ steps.package_new_version.outputs.package_new_version }}
+        working-directory: ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+
+      - name: Publish Nuget Package
+        run: |
+          dotnet nuget push ./${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}/nupkg/${{ env.PROJECT_NAME }}.${{ steps.package_new_version.outputs.package_new_version }}.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json --skip-duplicate
