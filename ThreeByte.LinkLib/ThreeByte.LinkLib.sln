@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeByte.LinkLib.TcpLink",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeByte.LinkLib.SerialLink", "ThreeByte.LinkLib.SerialLink\ThreeByte.LinkLib.SerialLink.csproj", "{94D67D84-66B4-42D5-B933-CFE6D8BB0794}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeByte.LinkLib.NetBooter", "ThreeByte.LinkLib.NetBooter\ThreeByte.LinkLib.NetBooter.csproj", "{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{94D67D84-66B4-42D5-B933-CFE6D8BB0794}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94D67D84-66B4-42D5-B933-CFE6D8BB0794}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94D67D84-66B4-42D5-B933-CFE6D8BB0794}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
