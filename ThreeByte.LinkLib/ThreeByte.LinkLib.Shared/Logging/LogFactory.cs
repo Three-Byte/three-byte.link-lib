@@ -4,7 +4,7 @@ namespace ThreeByte.LinkLib.Shared.Logging
 {
 
     /// <summary>
-    /// Factory for creating loggers for teh shared libs
+    /// Factory for creating loggers for the shared libs
     /// </summary>
     public class LogFactory
     {
