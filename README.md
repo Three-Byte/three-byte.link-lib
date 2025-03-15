@@ -1,7 +1,7 @@
 # Network Communication Library
 
 ## Overview
-The Network Communication Library provides a simple and efficient way to handle network communication using TCP, UDP, and Serial protocols. This library is designed to be easy to use and integrate into your projects, offering robust and reliable communication capabilities.
+The Network Communication Library provides a simple and efficient way to handle network communication using TCP, UDP, and Serial protocols. This library is designed to be easy to use and integrate into your projects, offering robust and reliable communication capabilities. /
 
 ## Features
 - **TCP Communication**: Establish and manage TCP connections for reliable data transfer.
