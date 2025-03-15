@@ -1,41 +1,29 @@
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using ThreeByte.LinkLib.Shared.Logging;
 
 namespace ThreeByte.LinkLib.TcpLink
 {
     public class AsyncTcpLink : IDisposable
     {
-        public event EventHandler<bool>? IsConnectedChanged;
-        public event EventHandler<bool>? IsEnabledChanged;
-        public event EventHandler<Exception>? ErrorOccurred;
-        public event EventHandler? DataReceived;
-        public bool IsConnected => _isConnected;
-        public bool IsEnabled => _isEnabled;
-        public string Address => _settings.Address;
-        public int Port => _settings.Port;
-        public bool HasData => _incomingData.Count > 0;
-
         private const int BufferSize = 8092;
         private const int MaxDataSize = 100;
-
-        private readonly TcpLinkSettings _settings;
         private readonly ILogger _logger;
 
-        private bool _isEnabled = true;
-        private bool _isDisposed = false;
-        private bool _isConnected = false;
-        private List<byte[]> _incomingData = new List<byte[]>();
-        private object _clientLock = new object();
+        private readonly TcpLinkSettings _settings;
+        private readonly object _clientLock = new object();
         private IAsyncResult? _connectResult;
+        private readonly List<byte[]> _incomingData = new List<byte[]>();
+        private bool _isDisposed;
+
+        private NetworkStream? _networkStream;
         private IAsyncResult? _readResult;
-        private IAsyncResult? _writeResult;
 
         private TcpClient? _tcpClient;
-        private NetworkStream? _networkStream;
+        private IAsyncResult? _writeResult;
 
         public AsyncTcpLink(string address, int port)
             : this(address, port, true)
@@ -45,7 +33,7 @@ namespace ThreeByte.LinkLib.TcpLink
         public AsyncTcpLink(string address, int port, bool enabled = true)
         {
             _settings = new TcpLinkSettings(address, port);
-            _isEnabled = enabled;
+            IsEnabled = enabled;
             _logger = LogFactory.Create<AsyncTcpLink>();
 
             if (enabled)
@@ -54,19 +42,49 @@ namespace ThreeByte.LinkLib.TcpLink
             }
         }
 
+        public bool IsConnected { get; private set; }
+
+        public bool IsEnabled { get; private set; } = true;
+
+        public string Address => _settings.Address;
+        public int Port => _settings.Port;
+        public bool HasData => _incomingData.Count > 0;
+
         /// <summary>
-        /// Sets a value indicating whether messages should be propagated to the network or not
+        ///     Cancels the thread and releases resources.
+        ///     Clients of this class are responsible for calling it.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _isDisposed = true;
+            _logger.LogInformation("Cleaning up network resources.");
+
+            SafeClose();
+        }
+
+        public event EventHandler<bool>? IsConnectedChanged;
+        public event EventHandler<bool>? IsEnabledChanged;
+        public event EventHandler<Exception>? ErrorOccurred;
+        public event EventHandler? DataReceived;
+
+        /// <summary>
+        ///     Sets a value indicating whether messages should be propagated to the network or not
         /// </summary>
         /// <param name="value"></param>
         public void SetEnabled(bool value)
         {
-            _isEnabled = value;
+            IsEnabled = value;
 
-            if (!_isEnabled)
+            if (!IsEnabled)
             {
                 SafeClose();
             }
-            else if (!_isConnected)
+            else if (!IsConnected)
             {
                 SafeConnect();
             }
@@ -75,12 +93,12 @@ namespace ThreeByte.LinkLib.TcpLink
         }
 
         /// <summary>
-        /// Asynchronously sends the TCP message, waiting until the connection is reestablihsed if necessary
+        ///     Asynchronously sends the TCP message, waiting until the connection is reestablihsed if necessary
         /// </summary>
         /// <param name="message">binary message to be sent</param>
         public void SendMessage(byte[] message)
         {
-            if (!_isEnabled)
+            if (!IsEnabled)
             {
                 return;
             }
@@ -111,24 +129,7 @@ namespace ThreeByte.LinkLib.TcpLink
         }
 
         /// <summary>
-        /// Cancels the thread and releases resources.
-        /// Clients of this class are responsible for calling it.
-        /// </summary>
-        public void Dispose()
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-
-            _isDisposed = true;
-            _logger.LogInformation("Cleaning up network resources.");
-
-            SafeClose();
-        }
-
-        /// <summary>
-        /// Very carefully checks and shuts down the tcpClient and sets it to null
+        ///     Very carefully checks and shuts down the tcpClient and sets it to null
         /// </summary>
         private void SafeClose()
         {
@@ -175,7 +176,7 @@ namespace ThreeByte.LinkLib.TcpLink
         }
 
         /// <summary>
-        /// Carefully check to see if the link is connected or can be reestablished
+        ///     Carefully check to see if the link is connected or can be reestablished
         /// </summary>
         private void SafeConnect()
         {
@@ -236,7 +237,8 @@ namespace ThreeByte.LinkLib.TcpLink
                     {
                         ChangeIsConnected(false);
                     }
-                    if (!_isEnabled)
+
+                    if (!IsEnabled)
                     {
                         SafeClose();
                     }
@@ -252,9 +254,9 @@ namespace ThreeByte.LinkLib.TcpLink
                     _logger.LogDebug("Clearing Connect Result.");
                     _connectResult = null;
 
-                    if (_isEnabled)
+                    if (IsEnabled)
                     {
-                        if (!_isConnected)
+                        if (!IsConnected)
                         {
                             Timer timer = new Timer(
                                 SafeConnect,
@@ -296,7 +298,7 @@ namespace ThreeByte.LinkLib.TcpLink
 
         private void ReceiveData()
         {
-            if (!_isEnabled)
+            if (!IsEnabled)
             {
                 return;
             }
@@ -362,7 +364,6 @@ namespace ThreeByte.LinkLib.TcpLink
 
                         ChangeIsConnected(true);
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -386,15 +387,45 @@ namespace ThreeByte.LinkLib.TcpLink
             ReceiveData();
         }
 
+        /// <summary>
+        ///     Fetches and removes (pops) the next available group of bytes as received on this link in order (FIFO)
+        /// </summary>
+        /// <returns>null if the link is not Enabled or there is no data currently queued to return, an array of bytes otherwise.</returns>
+        public byte[] GetMessage()
+        {
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException("Cannot get message from disposed NetworkLink");
+            }
+
+            //Return null if the link is not enabled
+            if (IsEnabled)
+            {
+                return null;
+            }
+
+            byte[] newMessage = null;
+            lock (_incomingData)
+            {
+                if (HasData)
+                {
+                    newMessage = _incomingData[0];
+                    _incomingData.RemoveAt(0);
+                }
+            }
+
+            return newMessage;
+        }
+
         private void ChangeIsConnected(bool value)
         {
-            _isConnected = value;
+            IsConnected = value;
             IsConnectedChanged?.Invoke(this, value);
         }
 
         private void HandleError(Exception ex, string message)
         {
-            _logger.LogError(exception: ex, message: message);
+            _logger.LogError(ex, message);
             ErrorOccurred?.Invoke(this, ex);
         }
     }

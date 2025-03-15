@@ -2,6 +2,10 @@
 
 namespace ThreeByte.LinkLib.Shared.Logging
 {
+
+    /// <summary>
+    /// Factory for creating loggers
+    /// </summary>
     public class LogFactory
     {
         public static ILogger Create<T>()
