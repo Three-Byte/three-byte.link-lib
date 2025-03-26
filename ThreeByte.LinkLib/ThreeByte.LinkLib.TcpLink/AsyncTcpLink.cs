@@ -399,7 +399,7 @@ namespace ThreeByte.LinkLib.TcpLink
             }
 
             //Return null if the link is not enabled
-            if (IsEnabled)
+            if (!IsEnabled)
             {
                 return null;
             }
