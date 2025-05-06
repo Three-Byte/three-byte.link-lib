@@ -14,6 +14,7 @@ namespace ThreeByte.LinkLib.SerialLink
         public event EventHandler? DataReceived;
         public bool IsConnected => _isConnected;
         public bool IsEnabled => _isEnabled;
+        public bool IsOpen => _serialPort?.IsOpen ?? false;
         public bool HasData => _incomingData.Count > 0;
 
         private const int MaxDataSize = 100;
