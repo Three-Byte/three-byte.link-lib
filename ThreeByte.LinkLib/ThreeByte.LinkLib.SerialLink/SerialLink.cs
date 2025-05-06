@@ -16,6 +16,7 @@ namespace ThreeByte.LinkLib.SerialLink
         public bool IsEnabled => _isEnabled;
         public bool IsOpen => _serialPort?.IsOpen ?? false;
         public bool HasData => _incomingData.Count > 0;
+        public string ComPort => _settings.ComPort;
 
         private const int MaxDataSize = 100;
 
