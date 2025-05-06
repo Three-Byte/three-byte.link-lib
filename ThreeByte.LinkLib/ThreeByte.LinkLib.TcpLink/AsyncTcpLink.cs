@@ -391,7 +391,7 @@ namespace ThreeByte.LinkLib.TcpLink
         ///     Fetches and removes (pops) the next available group of bytes as received on this link in order (FIFO)
         /// </summary>
         /// <returns>null if the link is not Enabled or there is no data currently queued to return, an array of bytes otherwise.</returns>
-        public byte[] GetMessage()
+        public byte[]? GetMessage()
         {
             if (_isDisposed)
             {
@@ -404,7 +404,7 @@ namespace ThreeByte.LinkLib.TcpLink
                 return null;
             }
 
-            byte[] newMessage = null;
+            byte[]? newMessage = null;
             lock (_incomingData)
             {
                 if (HasData)
