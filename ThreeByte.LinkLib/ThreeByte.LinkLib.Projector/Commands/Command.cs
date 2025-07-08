@@ -14,7 +14,6 @@
 
         internal virtual bool ProcessAnswerString(string a)
         {
-
             if (a.IndexOf("=ERR1") >= 0)
             {
                 _cmdResponse = CommandResponse.UNDEFINED_CMD;
