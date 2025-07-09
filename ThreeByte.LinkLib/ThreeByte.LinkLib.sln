@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeByte.LinkLib.SerialLin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeByte.LinkLib.NetBooter", "ThreeByte.LinkLib.NetBooter\ThreeByte.LinkLib.NetBooter.csproj", "{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeByte.LinkLib.ProjectorLink", "ThreeByte.LinkLib.Projector\ThreeByte.LinkLib.ProjectorLink.csproj", "{65D63D85-301B-48E8-965F-256A132986DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A2A3348-6CC9-43F1-95AC-9CED4E7C4B05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65D63D85-301B-48E8-965F-256A132986DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D63D85-301B-48E8-965F-256A132986DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D63D85-301B-48E8-965F-256A132986DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D63D85-301B-48E8-965F-256A132986DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
