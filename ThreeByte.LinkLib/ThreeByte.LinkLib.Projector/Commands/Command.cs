@@ -24,7 +24,7 @@
             }
             else if (a.IndexOf("=ERR3") >= 0)
             {
-                _cmdResponse = CommandResponse.UNVAILABLE_TIME;
+                _cmdResponse = CommandResponse.UNAVAILABLE_TIME;
             }
             else if (a.IndexOf("=ERR4") >= 0)
             {

@@ -103,7 +103,6 @@ namespace ThreeByte.LinkLib.ProjectorLink
         public bool TurnOff()
         {
             PowerCommand pc = new PowerCommand(PowerCommand.Power.OFF);
-            Console.WriteLine(pc);
             return SendCommand(pc) == CommandResponse.SUCCESS;
         }
 
@@ -192,28 +191,31 @@ namespace ThreeByte.LinkLib.ProjectorLink
         {
             _logger.LogDebug("Open connection to projector. {addr}/{port}", _hostName, _port);
 
+            if (_tcpClient != null && _tcpClient.Connected)
+            {
+                return true;
+            }
+
             try
             {
-                if (_tcpClient == null || !_tcpClient.Connected)
-                {
-                    _tcpClient = new TcpClient(_hostName, _port);
-                    _stream = _tcpClient.GetStream();
-                    byte[] recvBytes = new byte[_tcpClient.ReceiveBufferSize];
-                    int bytesRcvd = _stream.Read(recvBytes, 0, _tcpClient.ReceiveBufferSize);
-                    string retVal = Encoding.ASCII.GetString(recvBytes, 0, bytesRcvd);
-                    retVal = retVal.Trim();
+                _tcpClient = new TcpClient(_hostName, _port);
+                _stream = _tcpClient.GetStream();
+                byte[] recvBytes = new byte[_tcpClient.ReceiveBufferSize];
+                int bytesRcvd = _stream.Read(recvBytes, 0, _tcpClient.ReceiveBufferSize);
+                string retVal = Encoding.ASCII.GetString(recvBytes, 0, bytesRcvd);
+                retVal = retVal.Trim();
 
-                    if (retVal.IndexOf("PJLINK 0") >= 0)
-                    {
-                        _useAuth = false;  //pw provided but projector doesn't need it.
-                        return true;
-                    }
-                    else if (retVal.IndexOf("PJLINK 1 ") >= 0)
-                    {
-                        _projectorKey = retVal.Replace("PJLINK 1 ", "");
-                        return true;
-                    }
+                if (retVal.IndexOf("PJLINK 0") >= 0)
+                {
+                    _useAuth = false;  //pw provided but projector doesn't need it.
+                    return true;
                 }
+                else if (retVal.IndexOf("PJLINK 1 ") >= 0)
+                {
+                    _projectorKey = retVal.Replace("PJLINK 1 ", "");
+                    return true;
+                }
+
                 return false;
             }
             catch (Exception ex)
