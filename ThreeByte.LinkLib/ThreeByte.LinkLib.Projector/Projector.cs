@@ -2,13 +2,19 @@
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using ThreeByte.LinkLib.Shared.Logging;
 using ThreeByte.LinkLib.ProjectorLink.Commands;
 
 namespace ThreeByte.LinkLib.ProjectorLink
 {
-    public class Projector
+    public class Projector : IDisposable
     {
+        public event EventHandler<bool>? IsConnectedChanged;
+        public event EventHandler<Exception>? ErrorOccurred;
+
         private const int DefaultPort = 4352;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// host name or IP (as string, e.g. "192.168.1.12") of the projector
@@ -39,12 +45,16 @@ namespace ThreeByte.LinkLib.ProjectorLink
         /// </summary>
         NetworkStream?_stream = null;
 
+        private bool _isConnected;
+        private bool _isDisposed;
+
         public Projector(string host, int port, string password)
         {
             _hostName = host;
             _port = port;
             _password = password;
             _useAuth = password != "";
+            _logger = LogFactory.Create<Projector>();
         }
 
         public Projector(string host, string password)
@@ -60,6 +70,23 @@ namespace ThreeByte.LinkLib.ProjectorLink
         public Projector(string host)
             : this(host, DefaultPort, string.Empty)
         {
+        }
+
+        /// <summary>
+        ///     Cancels the thread and releases resources.
+        ///     Clients of this class are responsible for calling it.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _isDisposed = true;
+            _logger.LogInformation("Cleaning up network resources.");
+
+            CloseConnection();
         }
 
         /// <summary>
@@ -144,8 +171,14 @@ namespace ThreeByte.LinkLib.ProjectorLink
                     int bytesRcvd = _stream.Read(recvBytes, 0, _tcpClient!.ReceiveBufferSize);
                     string returndata = Encoding.ASCII.GetString(recvBytes, 0, bytesRcvd);
                     returndata = returndata.Trim();
+                    _logger.LogDebug("Received data: {d}", returndata);
+
                     cmd.ProcessAnswerString(returndata);
                     return cmd.CmdResponse;
+                }
+                catch (Exception ex)
+                {
+                    HandleError(ex, $"Error during sending the command {cmd.GetType().Name}");
                 }
                 finally
                 {
@@ -158,6 +191,8 @@ namespace ThreeByte.LinkLib.ProjectorLink
 
         private bool InitConnection()
         {
+            _logger.LogDebug("Open connection to projector. {addr}/{port}", _hostName, _port);
+
             try
             {
                 if (_tcpClient == null || !_tcpClient.Connected)
@@ -165,34 +200,40 @@ namespace ThreeByte.LinkLib.ProjectorLink
                     _tcpClient = new TcpClient(_hostName, _port);
                     _stream = _tcpClient.GetStream();
                     byte[] recvBytes = new byte[_tcpClient.ReceiveBufferSize];
-                    int bytesRcvd = _stream.Read(recvBytes, 0, (int)_tcpClient.ReceiveBufferSize);
+                    int bytesRcvd = _stream.Read(recvBytes, 0, _tcpClient.ReceiveBufferSize);
                     string retVal = Encoding.ASCII.GetString(recvBytes, 0, bytesRcvd);
                     retVal = retVal.Trim();
 
                     if (retVal.IndexOf("PJLINK 0") >= 0)
                     {
+                        ChangeIsConnected(true);
                         _useAuth = false;  //pw provided but projector doesn't need it.
                         return true;
                     }
                     else if (retVal.IndexOf("PJLINK 1 ") >= 0)
                     {
+                        ChangeIsConnected(true);
                         _projectorKey = retVal.Replace("PJLINK 1 ", "");
                         return true;
                     }
                 }
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                HandleError(ex, "Connection Error.");
                 return false;
             }
-
         }
 
         private void CloseConnection()
         {
+            _logger.LogDebug("Close connection to projector.");
+
             _tcpClient?.Close();
             _stream?.Close();
+
+            ChangeIsConnected(false);
         }
 
         private string GetMD5Hash(string input)
@@ -207,6 +248,21 @@ namespace ThreeByte.LinkLib.ProjectorLink
                 toRet += b.ToString("x2");
             }
             return toRet;
+        }
+
+        private void ChangeIsConnected(bool value)
+        {
+            if (_isConnected != value)
+            {
+                _isConnected = value;
+                IsConnectedChanged?.Invoke(this, value);
+            }
+        }
+
+        private void HandleError(Exception ex, string message)
+        {
+            _logger.LogError(ex, message);
+            ErrorOccurred?.Invoke(this, ex);
         }
     }
 }
