@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using ThreeByte.LinkLib.Shared.Logging;
 using ThreeByte.LinkLib.ProjectorLink.Commands;
+using ThreeByte.LinkLib.Shared.Logging;
 
 namespace ThreeByte.LinkLib.ProjectorLink
 {
     public class Projector : IDisposable
     {
-        public event EventHandler<bool>? IsConnectedChanged;
         public event EventHandler<Exception>? ErrorOccurred;
+        public string Address => $"{_hostName}/{_port}";
 
         private const int DefaultPort = 4352;
         private readonly ILogger _logger;
@@ -45,7 +45,6 @@ namespace ThreeByte.LinkLib.ProjectorLink
         /// </summary>
         NetworkStream?_stream = null;
 
-        private bool _isConnected;
         private bool _isDisposed;
 
         public Projector(string host, int port, string password)
@@ -206,13 +205,11 @@ namespace ThreeByte.LinkLib.ProjectorLink
 
                     if (retVal.IndexOf("PJLINK 0") >= 0)
                     {
-                        ChangeIsConnected(true);
                         _useAuth = false;  //pw provided but projector doesn't need it.
                         return true;
                     }
                     else if (retVal.IndexOf("PJLINK 1 ") >= 0)
                     {
-                        ChangeIsConnected(true);
                         _projectorKey = retVal.Replace("PJLINK 1 ", "");
                         return true;
                     }
@@ -232,8 +229,6 @@ namespace ThreeByte.LinkLib.ProjectorLink
 
             _tcpClient?.Close();
             _stream?.Close();
-
-            ChangeIsConnected(false);
         }
 
         private string GetMD5Hash(string input)
@@ -248,15 +243,6 @@ namespace ThreeByte.LinkLib.ProjectorLink
                 toRet += b.ToString("x2");
             }
             return toRet;
-        }
-
-        private void ChangeIsConnected(bool value)
-        {
-            if (_isConnected != value)
-            {
-                _isConnected = value;
-                IsConnectedChanged?.Invoke(this, value);
-            }
         }
 
         private void HandleError(Exception ex, string message)
