@@ -39,11 +39,11 @@ namespace ThreeByte.LinkLib.ProjectorLink
         /// <summary>
         /// The connection client
         /// </summary>
-        TcpClient? _tcpClient = null;
+        private TcpClient? _tcpClient = null;
         /// <summary>
         /// The Network stream the _client provides
         /// </summary>
-        NetworkStream?_stream = null;
+        private NetworkStream? _stream = null;
 
         private bool _isDisposed;
 
