@@ -9,6 +9,8 @@ namespace ThreeByte.LinkLib.TcpLink
 {
     public class AsyncTcpLink : IDisposable
     {
+        public string Test => "Ukraine";
+
         private const int BufferSize = 8092;
         private const int MaxDataSize = 100;
         private readonly ILogger _logger;

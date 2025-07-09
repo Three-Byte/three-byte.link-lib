@@ -10,6 +10,8 @@ namespace ThreeByte.LinkLib.ProjectorLink
 {
     public class Projector : IDisposable
     {
+        public string Test => "Ukraine";
+
         public event EventHandler<Exception>? ErrorOccurred;
         public string Address => $"{_hostName}/{_port}";
 
