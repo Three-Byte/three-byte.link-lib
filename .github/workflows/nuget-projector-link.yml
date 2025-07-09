@@ -39,11 +39,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Test new code
-        run: |
-          cat ThreeByte.LinkLib/ThreeByte.LinkLib.ProjectorLink/Projector.cs | grep "string Test"
-          cat ThreeByte.LinkLib/ThreeByte.LinkLib.TcpLink/AsyncTcpLink.cs | grep "string Test"
-
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
