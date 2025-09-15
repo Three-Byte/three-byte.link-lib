@@ -11,6 +11,7 @@ on:
 
 env:
   GITHUB_REPO: "three-byte.link-lib"
+  GITHUB_USER_TOKEN: ${{ secrets.GHPAT }}
   PROJECT_PATH: "ThreeByte.LinkLib"
   PROJECT_NAME: "ThreeByte.LinkLib.Shared"
   INITIAL_PACKAGE_VERSION: "1.0.0"
@@ -71,18 +72,20 @@ jobs:
           echo "package_version=$package_version" >> $GITHUB_OUTPUT
           echo "first_deploy=$first_deploy" >> $GITHUB_OUTPUT
 
-      - name: Get label by PR number
-        id: get_label_by_pr
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/Three-Byte/${{ env.GITHUB_REPO }}/pulls/${{ github.event.pull_request.number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHPAT }}
+      - name: Get labels for closed PR
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REPO="${{ github.repository }}"
+          label=$(curl -s -H "Authorization: token ${{ env.GITHUB_USER_TOKEN }}" \
+            "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/labels" | jq -r '.[].name')
+          echo "Label for PR #$PR_NUMBER: $label"
+          echo "label=$label" >> $GITHUB_ENV
 
       - name: Get new version
         id: package_new_version
         run: |
-          label_name=$(echo '${{ steps.get_label_by_pr.outputs.data }}' | jq '.labels[0].name' | sed 's/"//g')
+          label_name=${{ env.label }}
           echo -e "Label name:\t\t $label_name"
           major=$(echo ${{ steps.package_version.outputs.package_version }} | cut -d "." -f1)
           minor=$(echo ${{ steps.package_version.outputs.package_version }} | cut -d "." -f2)
