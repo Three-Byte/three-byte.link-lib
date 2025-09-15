@@ -11,6 +11,7 @@ on:
 
 env:
   GITHUB_REPO: "three-byte.link-lib"
+  GITHUB_USER_TOKEN: ${{ secrets.GHPAT }}
   PROJECT_PATH: "ThreeByte.LinkLib"
   PROJECT_NAME: "ThreeByte.LinkLib.ProjectorLink"
   INITIAL_PACKAGE_VERSION: "1.0.0"
