@@ -158,7 +158,7 @@ namespace ThreeByte.LinkLib.SerialLink
             _serialLink.Dispose();
         }
 
-        private void OnDataReceived(object sender, EventArgs e)
+        private void OnDataReceived(object? sender, EventArgs e)
         {
             bool hasNewData = false;
 
@@ -239,7 +239,7 @@ namespace ThreeByte.LinkLib.SerialLink
             }
         }
 
-        private void OnErrorOccurred(object sender, Exception ex)
+        private void OnErrorOccurred(object? sender, Exception ex)
         {
             ErrorOccurred?.Invoke(sender, ex);
         }

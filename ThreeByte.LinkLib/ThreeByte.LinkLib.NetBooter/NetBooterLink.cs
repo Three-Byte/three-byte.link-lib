@@ -32,7 +32,7 @@ namespace ThreeByte.LinkLib.NetBooter
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<Exception>? ErrorOccurred;
 
         public void Power(int outlet, bool state)

@@ -220,7 +220,7 @@ namespace ThreeByte.LinkLib.UdpLink
             {
                 try
                 {
-                    IPEndPoint remoteEndpoint = new IPEndPoint(IPAddress.Any, _settings.RemotePort);
+                    IPEndPoint? remoteEndpoint = new IPEndPoint(IPAddress.Any, _settings.RemotePort);
                     byte[] bytesRead = _udpClient?.EndReceive(asyncResult, ref remoteEndpoint) ?? Array.Empty<byte>();
 
                     if (_isEnabled)

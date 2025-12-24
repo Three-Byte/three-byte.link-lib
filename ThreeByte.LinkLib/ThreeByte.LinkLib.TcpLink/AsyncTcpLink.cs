@@ -170,7 +170,7 @@ namespace ThreeByte.LinkLib.TcpLink
             ChangeIsConnected(false);
         }
 
-        private void SafeConnect(object state)
+        private void SafeConnect(object? state)
         {
             SafeConnect();
         }
@@ -325,7 +325,7 @@ namespace ThreeByte.LinkLib.TcpLink
 
         private void ReadCallback(IAsyncResult asyncResult)
         {
-            byte[] buffer = (byte[])asyncResult.AsyncState ?? Array.Empty<byte>();
+            byte[] buffer = (byte[]?)asyncResult.AsyncState ?? Array.Empty<byte>();
             bool hasNewData = false;
             int bytesRead = 0;
 
