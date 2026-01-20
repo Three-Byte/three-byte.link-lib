@@ -48,7 +48,7 @@
 
             if (_cmdDetail == Power.QUERY)
             {
-                a = a.Replace("%1POWR=", "");
+                a = a.ToUpper().Replace("%1POWR=", "");
                 int retVal = int.Parse(a);
                 if (retVal >= (int)PowerStatus.OFF && retVal <= (int)PowerStatus.WARMUP)
                 {
