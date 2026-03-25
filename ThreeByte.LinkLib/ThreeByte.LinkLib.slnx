@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="ThreeByte.LinkLib.NetBooter/ThreeByte.LinkLib.NetBooter.csproj" />
+  <Project Path="ThreeByte.LinkLib.ProjectorLink/ThreeByte.LinkLib.ProjectorLink.csproj" />
+  <Project Path="ThreeByte.LinkLib.SerialLink/ThreeByte.LinkLib.SerialLink.csproj" />
+  <Project Path="ThreeByte.LinkLib.Shared/ThreeByte.LinkLib.Shared.csproj" />
+  <Project Path="ThreeByte.LinkLib.TcpLink/ThreeByte.LinkLib.TcpLink.csproj" />
+  <Project Path="ThreeByte.LinkLib.UdpLink/ThreeByte.LinkLib.UdpLink.csproj" />
+</Solution>
