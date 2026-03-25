@@ -205,4 +205,4 @@ This library implements the [PJLink](https://pjlink.jbmia.or.jp/english/) Class 
 
 ## 📄 License
 
-Part of the [ThreeByte.LinkLib](https://github.com/olaafrossi/three-byte.link-lib) family of communication libraries.
+Part of the [ThreeByte.LinkLib](https://github.com/Three-Byte/three-byte.link-lib) family of communication libraries.

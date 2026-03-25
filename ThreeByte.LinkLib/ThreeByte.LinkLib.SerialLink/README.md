@@ -245,4 +245,4 @@ var serial = new SerialLink(settings);
 
 ## 📄 License
 
-Part of the [ThreeByte.LinkLib](https://github.com/olaafrossi/three-byte.link-lib) family of communication libraries.
+Part of the [ThreeByte.LinkLib](https://github.com/Three-Byte/three-byte.link-lib) family of communication libraries.
