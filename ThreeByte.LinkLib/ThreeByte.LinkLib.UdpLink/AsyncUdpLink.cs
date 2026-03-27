@@ -7,7 +7,7 @@ using ThreeByte.LinkLib.Shared.Logging;
 
 namespace ThreeByte.LinkLib.UdpLink
 {
-    public class AsyncUdpLink
+    public class AsyncUdpLink : IDisposable
     {
         public event EventHandler<bool>? IsEnabledChanged;
         public event EventHandler<Exception>? ErrorOccurred;

@@ -5,4 +5,5 @@
   <Project Path="ThreeByte.LinkLib.Shared/ThreeByte.LinkLib.Shared.csproj" />
   <Project Path="ThreeByte.LinkLib.TcpLink/ThreeByte.LinkLib.TcpLink.csproj" />
   <Project Path="ThreeByte.LinkLib.UdpLink/ThreeByte.LinkLib.UdpLink.csproj" />
+  <Project Path="ThreeByte.LinkLib.Tests/ThreeByte.LinkLib.Tests.csproj" />
 </Solution>

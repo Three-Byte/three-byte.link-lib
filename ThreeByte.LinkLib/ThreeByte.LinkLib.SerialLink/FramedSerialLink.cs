@@ -75,12 +75,12 @@ namespace ThreeByte.LinkLib.SerialLink
             }
 
             //Add the header and footer
-            byte[] header = new byte[0];
+            byte[] header = Array.Empty<byte>();
             if (SendFrame != null && SendFrame.Header != null)
             {
                 header = SendFrame.Header;
             }
-            byte[] footer = new byte[0];
+            byte[] footer = Array.Empty<byte>();
             if (SendFrame != null && SendFrame.Footer != null)
             {
                 footer = SendFrame.Footer;
@@ -91,21 +91,18 @@ namespace ThreeByte.LinkLib.SerialLink
             Encoding.UTF8.GetBytes(message, 0, message.Length, messageBytes, header.Length);
             footer.CopyTo(messageBytes, message.Length + header.Length);
 
-            if (_serialLink != null)
+            try
             {
-                try
-                {
-                    _serialLink.SendData(messageBytes);
-                }
-                catch (ObjectDisposedException ode)
-                {
-                    HandleError(ode, "Cannot send a message of disposed FramedSerialLink.");
-                }
-                catch (Exception ex)
-                {
-                    //Also possible for the serial link to raise and UnauthorizedAccessException here
-                    HandleError(ex, "SendMessage error.");
-                }
+                _serialLink.SendData(messageBytes);
+            }
+            catch (ObjectDisposedException ode)
+            {
+                HandleError(ode, "Cannot send a message of disposed FramedSerialLink.");
+            }
+            catch (Exception ex)
+            {
+                //Also possible for the serial link to raise and UnauthorizedAccessException here
+                HandleError(ex, "SendMessage error.");
             }
         }
 
@@ -162,13 +159,13 @@ namespace ThreeByte.LinkLib.SerialLink
         {
             bool hasNewData = false;
 
-            byte[] header = new byte[0];
+            byte[] header = Array.Empty<byte>();
             if (ReceiveFrame != null && ReceiveFrame.Header != null)
             {
                 header = ReceiveFrame.Header;
             }
 
-            byte[] footer = new byte[0];
+            byte[] footer = Array.Empty<byte>();
             if (ReceiveFrame != null && ReceiveFrame.Footer != null)
             {
                 footer = ReceiveFrame.Footer;

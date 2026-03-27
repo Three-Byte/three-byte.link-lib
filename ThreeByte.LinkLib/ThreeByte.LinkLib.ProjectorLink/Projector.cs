@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
+using System.Security.Cryptography;
 using ThreeByte.LinkLib.ProjectorLink.Commands;
 using ThreeByte.LinkLib.Shared.Logging;
 
@@ -235,16 +235,18 @@ namespace ThreeByte.LinkLib.ProjectorLink
 
         private string GetMD5Hash(string input)
         {
-            MD5CryptoServiceProvider cryptoProvider = new MD5CryptoServiceProvider();
-            byte[] bs = Encoding.ASCII.GetBytes(input);
-            byte[] hash = cryptoProvider.ComputeHash(bs);
-
-            string toRet = "";
-            foreach (byte b in hash)
+            using (var md5 = MD5.Create())
             {
-                toRet += b.ToString("x2");
+                byte[] bs = Encoding.ASCII.GetBytes(input);
+                byte[] hash = md5.ComputeHash(bs);
+
+                StringBuilder sb = new StringBuilder(hash.Length * 2);
+                foreach (byte b in hash)
+                {
+                    sb.Append(b.ToString("x2"));
+                }
+                return sb.ToString();
             }
-            return toRet;
         }
 
         private void HandleError(Exception ex, string message)

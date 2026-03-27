@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="xunit" Version="2.*" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" />
+    <PackageReference Include="Moq" Version="4.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ThreeByte.LinkLib.Shared\ThreeByte.LinkLib.Shared.csproj" />
+    <ProjectReference Include="..\ThreeByte.LinkLib.TcpLink\ThreeByte.LinkLib.TcpLink.csproj" />
+    <ProjectReference Include="..\ThreeByte.LinkLib.UdpLink\ThreeByte.LinkLib.UdpLink.csproj" />
+    <ProjectReference Include="..\ThreeByte.LinkLib.SerialLink\ThreeByte.LinkLib.SerialLink.csproj" />
+    <ProjectReference Include="..\ThreeByte.LinkLib.NetBooter\ThreeByte.LinkLib.NetBooter.csproj" />
+    <ProjectReference Include="..\ThreeByte.LinkLib.ProjectorLink\ThreeByte.LinkLib.ProjectorLink.csproj" />
+  </ItemGroup>
+
+</Project>

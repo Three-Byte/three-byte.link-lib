@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
+using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using ThreeByte.LinkLib.Shared.Logging;
 
@@ -11,12 +12,19 @@ namespace ThreeByte.LinkLib.NetBooter
     {
         private readonly string _ipAddress;
         private readonly ILogger _logger;
+        private readonly HttpClient _httpClient;
         private readonly Dictionary<int, bool> _powerStates = new Dictionary<int, bool>();
 
         public NetBooterLink(string ipAddress)
         {
             _logger = LogFactory.Create<NetBooterLink>();
             _ipAddress = ipAddress;
+
+            var handler = new HttpClientHandler
+            {
+                Credentials = new NetworkCredential("admin", "admin")
+            };
+            _httpClient = new HttpClient(handler);
         }
 
         public bool this[int port]
@@ -39,10 +47,8 @@ namespace ThreeByte.LinkLib.NetBooter
         {
             try
             {
-                var c = new WebClient();
-                c.Credentials = new NetworkCredential("admin", "admin");
                 var commandUri = string.Format("http://{0}/cmd.cgi?$A3 {1} {2}", _ipAddress, outlet, state ? 1 : 0);
-                var response = c.DownloadString(commandUri);
+                var response = _httpClient.GetStringAsync(commandUri).GetAwaiter().GetResult();
                 _logger.LogDebug("Response: {0}", response);
             }
             catch (Exception ex)
@@ -56,10 +62,8 @@ namespace ThreeByte.LinkLib.NetBooter
         {
             try
             {
-                var c = new WebClient();
-                c.Credentials = new NetworkCredential("admin", "admin");
                 var commandUri = string.Format("http://{0}/cmd.cgi?$A5", _ipAddress);
-                var response = c.DownloadString(commandUri);
+                var response = _httpClient.GetStringAsync(commandUri).GetAwaiter().GetResult();
 
                 // Expected response: xxxx,cccc,tttt
                 // read right to left for each field, eg - 01 means port 1 is on
@@ -81,14 +85,6 @@ namespace ThreeByte.LinkLib.NetBooter
             {
                 _logger.LogError("Error getting power state: {0}", ex);
                 HandleError(ex, "Cannot Get Status");
-            }
-        }
-
-        private void NotifyPropertyChanged(string info)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+using System;
+using Microsoft.Extensions.Logging;
 
 namespace ThreeByte.LinkLib.Shared.Logging
 {
@@ -7,11 +8,12 @@ namespace ThreeByte.LinkLib.Shared.Logging
     /// </summary>
     public class LogFactory
     {
+        private static readonly Lazy<ILoggerFactory> Factory = new Lazy<ILoggerFactory>(() =>
+            LoggerFactory.Create(builder => { builder.AddConsole(); }));
+
         public static ILogger Create<T>()
         {
-            var factory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-
-            return factory.CreateLogger<T>();
+            return Factory.Value.CreateLogger<T>();
         }
     }
 }
