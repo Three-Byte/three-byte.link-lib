@@ -178,7 +178,7 @@ namespace ThreeByte.LinkLib.SerialLink
                         _serialPort.Parity = _settings.Parity;
                         _serialPort.DataBits = _settings.DataBits;
                         _serialPort.StopBits = StopBits.One;
-                        _serialPort.DataReceived += new SerialDataReceivedEventHandler(OnDataReceived);
+                        _serialPort.DataReceived += OnDataReceived;
                     }
 
                     if (!_isConnected)

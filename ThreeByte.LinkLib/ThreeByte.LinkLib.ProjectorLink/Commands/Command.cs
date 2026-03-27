@@ -2,8 +2,6 @@
 {
     public abstract class Command
     {
-        public delegate void CommandResultHandler(Command sender, CommandResponse response);
-
         protected CommandResponse _cmdResponse;
 
         internal virtual string GetCommandString()

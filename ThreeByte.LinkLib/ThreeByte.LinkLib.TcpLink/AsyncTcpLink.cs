@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ThreeByte.LinkLib.Shared.Logging;
 
@@ -384,7 +385,17 @@ namespace ThreeByte.LinkLib.TcpLink
                 DataReceived(this, new EventArgs());
             }
 
-            ReceiveData();
+            // When BeginRead completes synchronously the callback fires on the same
+            // thread, so a direct call to ReceiveData would recurse on the same stack
+            // and eventually overflow. Trampolining via the ThreadPool breaks the chain.
+            if (asyncResult.CompletedSynchronously)
+            {
+                ThreadPool.QueueUserWorkItem(_ => ReceiveData());
+            }
+            else
+            {
+                ReceiveData();
+            }
         }
 
         /// <summary>
